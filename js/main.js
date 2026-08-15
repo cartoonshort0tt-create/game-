@@ -2,26 +2,26 @@
   'use strict';
 
   var GA = window.GameArena;
-  var $ = function (id) { return document.getElementById(id); };
+  var $ = GA.$;
 
   var GAMES = [
-    { id: 'rps', name: 'Rock · Paper · Scissors', icon: '✂️', desc: 'Best of 5 rounds. Fast, fun, no skill floor — pure nerve.', playable: true },
-    { id: 'coinflip', name: 'Coin Flip', icon: '🪙', desc: 'Heads or tails, winner takes the pot.', playable: false },
-    { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', desc: 'The classic 3x3 grid duel.', playable: false },
-    { id: 'connect4', name: 'Connect 4', icon: '🔴', desc: 'Line up four before your rival does.', playable: false },
-    { id: 'chess', name: 'Chess', icon: '♟️', desc: 'The flagship game. Full rules, bot powered by Stockfish.', playable: false },
-    { id: 'ludo', name: 'Ludo', icon: '🎲', desc: 'Race your tokens home — up to 4 players.', playable: false }
+    { id: 'rps', name: 'Rock · Paper · Scissors', icon: '✂️', desc: 'Best of 5 rounds. Fast, fun, no skill floor — pure nerve.' },
+    { id: 'coinflip', name: 'Coin Flip', icon: '🪙', desc: 'Call it in the air. Best of 3 flips, winner takes the pot.' },
+    { id: 'tictactoe', name: 'Tic-Tac-Toe', icon: '⭕', desc: 'The classic 3x3 grid duel. One game, winner takes all.' },
+    { id: 'connect4', name: 'Connect 4', icon: '🔴', desc: 'Line up four before your rival does.' },
+    { id: 'chess', name: 'Chess', icon: '♟️', desc: 'The flagship game. Full rules, checkmate to win.' },
+    { id: 'ludo', name: 'Ludo', icon: '🎲', desc: 'Race both your tokens home before your rival.' }
   ];
 
-  var WIN_TARGET = 3;
   var HOUSE_KEEP = 0.9; // winner receives 90% of the pot
 
   var state = {
     activeGame: null,
     selectedTier: 'rookie',
-    selectedStake: 0,
-    match: null // { tier, stake, bot, playerWins, botWins, round, over }
+    selectedStake: 0
   };
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   /* ---------------- Header ---------------- */
 
@@ -51,16 +51,17 @@
     var grid = $('gameGrid');
     grid.innerHTML = '';
     GAMES.forEach(function (g) {
+      var playable = !!GA.Games[g.id];
       var card = document.createElement('div');
-      card.className = 'game-card' + (g.playable ? '' : ' locked');
+      card.className = 'game-card' + (playable ? '' : ' locked');
       card.innerHTML =
-        '<span class="badge ' + (g.playable ? '' : 'soon') + '">' + (g.playable ? 'Playable' : 'Coming Soon') + '</span>' +
+        '<span class="badge ' + (playable ? '' : 'soon') + '">' + (playable ? 'Playable' : 'Coming Soon') + '</span>' +
         '<div class="icon">' + g.icon + '</div>' +
         '<h3>' + g.name + '</h3>' +
         '<p>' + g.desc + '</p>' +
-        '<button class="btn ' + (g.playable ? 'btn-primary' : 'btn-secondary') + '" ' + (g.playable ? '' : 'disabled') + '>' +
-        (g.playable ? 'Play' : 'Locked') + '</button>';
-      if (g.playable) {
+        '<button class="btn ' + (playable ? 'btn-primary' : 'btn-secondary') + '" ' + (playable ? '' : 'disabled') + '>' +
+        (playable ? 'Play' : 'Locked') + '</button>';
+      if (playable) {
         card.querySelector('button').addEventListener('click', function () { openStakeModal(g.id); });
       }
       grid.appendChild(card);
@@ -140,6 +141,10 @@
     $('stakeOverlay').classList.remove('hidden');
   }
 
+  function computePayout(stake) {
+    return Math.floor(stake * 2 * HOUSE_KEEP);
+  }
+
   function updateStakeBalanceNote() {
     var note = $('stakeBalanceNote');
     var balance = GA.Wallet.getBalance();
@@ -151,9 +156,8 @@
       return;
     }
     var canAfford = balance >= state.selectedStake;
-    var potentialWin = Math.floor(state.selectedStake * 2 * HOUSE_KEEP);
     note.textContent = canAfford
-      ? 'Balance: 🪙 ' + balance + '. Win to collect 🪙 ' + potentialWin + ' (10% house cut applies).'
+      ? 'Balance: 🪙 ' + balance + '. Win to collect 🪙 ' + computePayout(state.selectedStake) + ' (10% house cut applies).'
       : 'Not enough coins — balance is 🪙 ' + balance + '.';
     note.classList.toggle('warn', !canAfford);
     startBtn.disabled = !canAfford;
@@ -171,7 +175,7 @@
     bAv.style.background = bot.color;
     $('introNamesLine').textContent = profile.displayName + ' vs ' + bot.name;
     $('introStakeLine').textContent = state.selectedStake > 0
-      ? 'Pot: 🪙 ' + (state.selectedStake * 2) + ' · Winner takes 🪙 ' + Math.floor(state.selectedStake * 2 * HOUSE_KEEP)
+      ? 'Pot: 🪙 ' + (state.selectedStake * 2) + ' · Winner takes 🪙 ' + computePayout(state.selectedStake)
       : 'Practice match — no stake';
 
     $('stakeOverlay').classList.add('hidden');
@@ -185,7 +189,8 @@
       if (count <= 0) {
         clearInterval(timer);
         $('introOverlay').classList.add('hidden');
-        beginRpsMatch(bot);
+        document.getElementById('screenLobby').classList.add('hidden');
+        GA.Games[state.activeGame].begin(bot, state.selectedStake);
         return;
       }
       counter.textContent = count > 0 ? count : 'GO!';
@@ -196,9 +201,10 @@
   }
 
   function startMatch() {
-    var bot = GA.RPS.createBot(state.selectedTier);
+    var module = GA.Games[state.activeGame];
+    var bot = module.createBot(state.selectedTier);
     if (state.selectedStake > 0) {
-      var ok = GA.Wallet.debit(state.selectedStake, 'RPS stake vs ' + bot.name);
+      var ok = GA.Wallet.debit(state.selectedStake, module.name + ' stake vs ' + bot.name);
       if (!ok) {
         updateStakeBalanceNote();
         return;
@@ -208,150 +214,15 @@
     playIntroThenStart(bot);
   }
 
-  /* ---------------- RPS gameplay ---------------- */
+  /* ---------------- Shared match resolution ---------------- */
 
-  function renderDots(container, wins) {
-    container.innerHTML = '';
-    for (var i = 0; i < WIN_TARGET; i++) {
-      var dot = document.createElement('span');
-      dot.className = 'score-dot' + (i < wins ? ' filled' : '');
-      container.appendChild(dot);
-    }
-  }
-
-  function beginRpsMatch(bot) {
-    var profile = GA.Profile.get();
-    state.match = { bot: bot, stake: state.selectedStake, playerWins: 0, botWins: 0, over: false };
-
-    $('rpsPlayerIcon').textContent = profile.avatar.emoji;
-    $('rpsPlayerNameLabel').textContent = profile.displayName;
-    $('rpsBotIcon').textContent = bot.emoji;
-    $('rpsBotNameLabel').textContent = bot.name;
-    renderDots($('rpsPlayerDots'), 0);
-    renderDots($('rpsBotDots'), 0);
-    $('rpsRoundResultText').textContent = 'Make your move!';
-    $('rpsRoundResultText').className = 'round-result-text';
-    resetHands();
-    setChoiceButtonsEnabled(true);
-
-    document.getElementById('screenLobby').classList.add('hidden');
-    document.getElementById('screenRps').classList.remove('hidden');
-  }
-
-  function renderChoiceButtons() {
-    $('rpsChoiceRow').querySelectorAll('.choice-btn').forEach(function (btn) {
-      btn.innerHTML = GA.Icons[btn.dataset.choice]();
-    });
-  }
-
-  function resetHands() {
-    var pHand = $('rpsPlayerHand');
-    var bHand = $('rpsBotHand');
-    pHand.innerHTML = GA.Icons.idle();
-    bHand.innerHTML = GA.Icons.idle();
-    pHand.className = 'rps-hand';
-    bHand.className = 'rps-hand';
-  }
-
-  function setChoiceButtonsEnabled(enabled) {
-    $('rpsChoiceRow').querySelectorAll('.choice-btn').forEach(function (btn) {
-      btn.disabled = !enabled;
-    });
-  }
-
-  var CADENCE_WORDS = ['Rock…', 'Paper…', 'Scissors…', 'Shoot!'];
-
-  function playRound(playerChoice) {
-    if (!state.match || state.match.over) return;
-    setChoiceButtonsEnabled(false);
-
-    var pHand = $('rpsPlayerHand');
-    var bHand = $('rpsBotHand');
-    var resultText = $('rpsRoundResultText');
-    pHand.classList.add('charging');
-    bHand.classList.add('charging');
-
-    var wordIndex = 0;
-    resultText.textContent = CADENCE_WORDS[wordIndex];
-    resultText.className = 'round-result-text cadence';
-    var cadenceTimer = setInterval(function () {
-      wordIndex++;
-      if (wordIndex < CADENCE_WORDS.length) resultText.textContent = CADENCE_WORDS[wordIndex];
-    }, 260);
-
-    setTimeout(function () {
-      clearInterval(cadenceTimer);
-      pHand.classList.remove('charging');
-      bHand.classList.remove('charging');
-
-      var bot = state.match.bot;
-      var botChoice = bot.nextMove();
-      bot.recordPlayerChoice(playerChoice);
-
-      pHand.innerHTML = GA.Icons[playerChoice]();
-      bHand.innerHTML = GA.Icons[botChoice]();
-      pHand.className = 'rps-hand reveal-flip';
-      bHand.className = 'rps-hand reveal-flip';
-      $('rpsArena').classList.add('impact-shake');
-      setTimeout(function () { $('rpsArena').classList.remove('impact-shake'); }, 360);
-
-      var outcome = GA.RPS.judgeRound(playerChoice, botChoice);
-      if (outcome === 'player') {
-        state.match.playerWins++;
-        pHand.className = 'rps-hand reveal-flip glow-win';
-        bHand.className = 'rps-hand reveal-flip glow-lose';
-        resultText.textContent = capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!';
-        resultText.className = 'round-result-text win';
-      } else if (outcome === 'bot') {
-        state.match.botWins++;
-        pHand.className = 'rps-hand reveal-flip glow-lose';
-        bHand.className = 'rps-hand reveal-flip glow-win';
-        resultText.textContent = capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.';
-        resultText.className = 'round-result-text lose';
-      } else {
-        pHand.className = 'rps-hand reveal-flip glow-draw';
-        bHand.className = 'rps-hand reveal-flip glow-draw';
-        resultText.textContent = 'Both chose ' + playerChoice + ' — draw, replay the round.';
-        resultText.className = 'round-result-text draw';
-      }
-
-      renderDots($('rpsPlayerDots'), state.match.playerWins);
-      renderDots($('rpsBotDots'), state.match.botWins);
-
-      var matchOver = state.match.playerWins >= WIN_TARGET || state.match.botWins >= WIN_TARGET;
-      setTimeout(function () {
-        if (matchOver) {
-          finishMatch(state.match.playerWins >= WIN_TARGET ? 'win' : 'loss');
-        } else {
-          resetHands();
-          resultText.textContent = 'Make your move!';
-          resultText.className = 'round-result-text';
-          setChoiceButtonsEnabled(true);
-        }
-      }, 1500);
-    }, 1100);
-  }
-
-  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-  function forfeitMatch() {
-    if (!state.match || state.match.over) return;
-    if (!confirm('Forfeit this match? ' + (state.match.stake > 0 ? 'Your staked coins will not be refunded.' : ''))) return;
-    finishMatch('loss');
-  }
-
-  function finishMatch(outcome) {
-    if (!state.match || state.match.over) return;
-    state.match.over = true;
-
-    var stake = state.match.stake;
-    var bot = state.match.bot;
+  function finishMatch(gameId, bot, stake, outcome, scoreLine) {
     var delta = 0;
 
     if (outcome === 'win') {
       if (stake > 0) {
-        var payout = Math.floor(stake * 2 * HOUSE_KEEP);
-        GA.Wallet.credit(payout, 'RPS win vs ' + bot.name);
+        var payout = computePayout(stake);
+        GA.Wallet.credit(payout, GAMES.filter(function (g) { return g.id === gameId; })[0].name + ' win vs ' + bot.name);
         delta = payout - stake;
       }
       var firstWin = GA.Wallet.claimFirstWinBonusIfAvailable();
@@ -359,33 +230,34 @@
         delta += firstWin;
         setTimeout(function () { showToast('🎉 First win of the day! +' + firstWin + ' bonus coins'); }, 600);
       }
+    } else if (outcome === 'draw') {
+      if (stake > 0) {
+        GA.Wallet.credit(stake, gameId + ' draw refund vs ' + bot.name);
+      }
+      delta = 0;
     } else {
       delta = -stake;
     }
 
     GA.Profile.recordResult(outcome);
-    GA.MatchHistory.record({
-      game: 'rps', opponent: bot.name, tier: bot.tier, stake: stake,
-      result: outcome, coinDelta: delta,
-      score: state.match.playerWins + '-' + state.match.botWins
-    });
+    GA.MatchHistory.record({ game: gameId, opponent: bot.name, tier: bot.tier, stake: stake, result: outcome, coinDelta: delta, score: scoreLine });
     renderHeader();
-    showResults(outcome, delta);
+    showResults(gameId, bot, outcome, delta, scoreLine);
   }
 
-  function showResults(outcome, delta) {
-    document.getElementById('screenRps').classList.add('hidden');
+  function showResults(gameId, bot, outcome, delta, scoreLine) {
+    document.getElementById('screen' + capitalize(gameId)).classList.add('hidden');
     document.getElementById('screenLobby').classList.remove('hidden');
 
-    $('resultsEmoji').innerHTML = outcome === 'win' ? GA.Icons.trophy() : GA.Icons.brokenStone();
+    $('resultsEmoji').innerHTML = outcome === 'win' ? GA.Icons.trophy() : outcome === 'draw' ? GA.Icons.idle() : GA.Icons.brokenStone();
     var title = $('resultsTitle');
-    title.textContent = outcome === 'win' ? 'You Win!' : 'You Lost';
-    title.className = 'results-title ' + (outcome === 'win' ? 'win' : 'lose');
-    $('resultsScoreLine').textContent = 'Final score ' + state.match.playerWins + ' – ' + state.match.botWins + ' vs ' + state.match.bot.name;
+    title.textContent = outcome === 'win' ? 'You Win!' : outcome === 'draw' ? 'Draw' : 'You Lost';
+    title.className = 'results-title ' + (outcome === 'win' ? 'win' : outcome === 'draw' ? 'draw' : 'lose');
+    $('resultsScoreLine').textContent = scoreLine + ' vs ' + bot.name;
 
     var deltaEl = $('resultsCoinDelta');
     if (delta === 0) {
-      deltaEl.textContent = 'Practice match — no coins changed hands.';
+      deltaEl.textContent = outcome === 'draw' ? 'Draw — your stake was refunded.' : 'Practice match — no coins changed hands.';
       deltaEl.className = 'coin-delta';
     } else {
       deltaEl.textContent = (delta > 0 ? '+' : '') + delta + ' 🪙';
@@ -399,7 +271,7 @@
       flash.className = 'screen-flash';
       document.body.appendChild(flash);
       setTimeout(function () { flash.remove(); }, 700);
-    } else {
+    } else if (outcome === 'loss') {
       $('resultsOverlay').querySelector('.modal-card').classList.add('shake-in');
       setTimeout(function () {
         var card = $('resultsOverlay').querySelector('.modal-card');
@@ -407,6 +279,17 @@
       }, 500);
     }
   }
+
+  GA.Arena = {
+    finishMatch: finishMatch,
+    showToast: showToast,
+    computePayout: computePayout,
+    HOUSE_KEEP: HOUSE_KEEP,
+    backToLobby: function (gameId) {
+      document.getElementById('screen' + capitalize(gameId)).classList.add('hidden');
+      document.getElementById('screenLobby').classList.remove('hidden');
+    }
+  };
 
   /* ---------------- Event wiring ---------------- */
 
@@ -431,17 +314,10 @@
     });
     $('startMatchBtn').addEventListener('click', startMatch);
 
-    $('rpsChoiceRow').addEventListener('click', function (e) {
-      var btn = e.target.closest('.choice-btn');
-      if (!btn || btn.disabled) return;
-      playRound(btn.dataset.choice);
-    });
-    $('rpsForfeitBtn').addEventListener('click', forfeitMatch);
-
     $('resultsLobbyBtn').addEventListener('click', function () { $('resultsOverlay').classList.add('hidden'); });
     $('resultsAgainBtn').addEventListener('click', function () {
       $('resultsOverlay').classList.add('hidden');
-      openStakeModal('rps');
+      openStakeModal(state.activeGame);
     });
   }
 
@@ -450,7 +326,6 @@
   function boot() {
     renderHeader();
     renderGameGrid();
-    renderChoiceButtons();
     wireEvents();
     var bonus = GA.Wallet.claimDailyBonusIfAvailable();
     if (bonus) {

@@ -62,6 +62,41 @@
         'icon-trophy'
       );
     },
+    coinHeads: function () {
+      return svg(
+        '<ellipse cx="50" cy="92" rx="26" ry="5" fill="#000" opacity="0.2"/>' +
+        '<circle cx="50" cy="48" r="38" fill="url(#goldGrad)" stroke="#8a6a1f" stroke-width="2.5"/>' +
+        '<circle cx="50" cy="48" r="30" fill="none" stroke="#8a6a1f" stroke-width="1.4" opacity="0.6"/>' +
+        '<path d="M50 26 l8 16 h-16 Z" fill="#8a6a1f" opacity="0.85"/>' +
+        '<circle cx="50" cy="58" r="7" fill="#8a6a1f" opacity="0.85"/>' +
+        '<path d="M36 62 h28" stroke="#8a6a1f" stroke-width="3" stroke-linecap="round" opacity="0.85"/>',
+        'icon-coin'
+      );
+    },
+    coinTails: function () {
+      return svg(
+        '<ellipse cx="50" cy="92" rx="26" ry="5" fill="#000" opacity="0.2"/>' +
+        '<circle cx="50" cy="48" r="38" fill="url(#goldGrad)" stroke="#8a6a1f" stroke-width="2.5"/>' +
+        '<circle cx="50" cy="48" r="30" fill="none" stroke="#8a6a1f" stroke-width="1.4" opacity="0.6"/>' +
+        '<path d="M38 34 a12 12 0 1 1 12 20 l-4 8" fill="none" stroke="#8a6a1f" stroke-width="4.5" stroke-linecap="round"/>' +
+        '<circle cx="46" cy="66" r="2.6" fill="#8a6a1f"/>',
+        'icon-coin'
+      );
+    },
+    xMark: function () {
+      return svg(
+        '<g filter="url(#softGlow)">' +
+        '<path d="M22 22 L78 78 M78 22 L22 78" stroke="url(#goldGrad)" stroke-width="12" stroke-linecap="round"/>' +
+        '</g>',
+        'icon-xmark'
+      );
+    },
+    oMark: function () {
+      return svg(
+        '<circle cx="50" cy="50" r="30" fill="none" stroke="url(#bladeGrad)" stroke-width="12" filter="url(#softGlow)"/>',
+        'icon-omark'
+      );
+    },
     brokenStone: function () {
       return svg(
         '<ellipse cx="50" cy="90" rx="28" ry="6" fill="#000" opacity="0.25"/>' +

@@ -110,6 +110,98 @@
     </div>
   </section>
 
+  <!-- Coin Flip -->
+  <section id="screenCoinflip" class="hidden">
+    <div class="rps-screen">
+      <div class="rps-scoreboard">
+        <div class="rps-player-tag">
+          <span id="coinflipPlayerIcon">🦊</span>
+          <span id="coinflipPlayerNameLabel">You</span>
+          <span class="score-dots" id="coinflipPlayerDots"></span>
+        </div>
+        <div class="rps-vs-label">VS</div>
+        <div class="rps-player-tag">
+          <span class="score-dots" id="coinflipBotDots"></span>
+          <span id="coinflipBotNameLabel">Bot</span>
+          <span id="coinflipBotIcon">🐣</span>
+        </div>
+      </div>
+
+      <div class="round-result-text" id="coinflipRoundResultText">Call it in the air!</div>
+
+      <div class="coin-stage">
+        <div class="coin-disc" id="coinDisc"></div>
+      </div>
+
+      <div class="choice-row" id="coinflipChoiceRow">
+        <button class="choice-btn call-btn" data-call="heads">Heads</button>
+        <button class="choice-btn call-btn" data-call="tails">Tails</button>
+      </div>
+
+      <button class="rps-quit" id="coinflipForfeitBtn">Forfeit match</button>
+    </div>
+  </section>
+
+  <!-- Tic-Tac-Toe -->
+  <section id="screenTictactoe" class="hidden">
+    <div class="rps-screen">
+      <div class="rps-scoreboard">
+        <div class="rps-player-tag"><span id="tttPlayerIcon">🦊</span><span id="tttPlayerNameLabel">You</span></div>
+        <div class="rps-vs-label">VS</div>
+        <div class="rps-player-tag"><span id="tttBotNameLabel">Bot</span><span id="tttBotIcon">🐣</span></div>
+      </div>
+      <div class="round-result-text" id="tttStatusText">Your turn</div>
+      <div class="ttt-board" id="tttBoard"></div>
+      <button class="rps-quit" id="tttForfeitBtn">Forfeit match</button>
+    </div>
+  </section>
+
+  <!-- Connect 4 -->
+  <section id="screenConnect4" class="hidden">
+    <div class="rps-screen">
+      <div class="rps-scoreboard">
+        <div class="rps-player-tag"><span id="c4PlayerIcon">🦊</span><span id="c4PlayerNameLabel">You</span></div>
+        <div class="rps-vs-label">VS</div>
+        <div class="rps-player-tag"><span id="c4BotNameLabel">Bot</span><span id="c4BotIcon">🐣</span></div>
+      </div>
+      <div class="round-result-text" id="c4StatusText">Your turn — pick a column</div>
+      <div class="c4-board" id="c4Board"></div>
+      <button class="rps-quit" id="c4ForfeitBtn">Forfeit match</button>
+    </div>
+  </section>
+
+  <!-- Chess -->
+  <section id="screenChess" class="hidden">
+    <div class="rps-screen">
+      <div class="rps-scoreboard">
+        <div class="rps-player-tag"><span id="chessPlayerIcon">🦊</span><span id="chessPlayerNameLabel">You (White)</span></div>
+        <div class="rps-vs-label">VS</div>
+        <div class="rps-player-tag"><span id="chessBotNameLabel">Bot (Black)</span><span id="chessBotIcon">🐣</span></div>
+      </div>
+      <div class="round-result-text" id="chessStatusText">Your move</div>
+      <div class="chess-board" id="chessBoard"></div>
+      <button class="rps-quit" id="chessForfeitBtn">Resign match</button>
+    </div>
+  </section>
+
+  <!-- Ludo -->
+  <section id="screenLudo" class="hidden">
+    <div class="rps-screen">
+      <div class="rps-scoreboard">
+        <div class="rps-player-tag"><span id="ludoPlayerIcon">🦊</span><span id="ludoPlayerNameLabel">You</span></div>
+        <div class="rps-vs-label">VS</div>
+        <div class="rps-player-tag"><span id="ludoBotNameLabel">Bot</span><span id="ludoBotIcon">🐣</span></div>
+      </div>
+      <div class="round-result-text" id="ludoStatusText">Roll to start</div>
+      <div class="ludo-track" id="ludoTrack"></div>
+      <div class="ludo-controls">
+        <div class="ludo-die" id="ludoDie">🎲</div>
+        <button class="btn btn-primary" id="ludoRollBtn">Roll Dice</button>
+      </div>
+      <button class="rps-quit" id="ludoForfeitBtn">Forfeit match</button>
+    </div>
+  </section>
+
 </div>
 
 <!-- Avatar / Profile modal -->
@@ -192,12 +284,25 @@
 <div class="confetti-layer" id="confettiLayer"></div>
 <div class="toast hidden" id="toast"></div>
 
+<script src="js/core/bootstrap.js"></script>
 <script src="js/core/wallet.js"></script>
 <script src="js/core/profile.js"></script>
 <script src="js/core/matchHistory.js"></script>
-<script src="js/games/rps/engine.js"></script>
+<script src="js/core/botPersonas.js"></script>
 <script src="js/ui/icons.js"></script>
 <script src="js/ui/confetti.js"></script>
+<script src="js/games/rps/engine.js"></script>
+<script src="js/ui/rpsScreen.js"></script>
+<script src="js/games/coinflip/engine.js"></script>
+<script src="js/ui/coinflipScreen.js"></script>
+<script src="js/games/tictactoe/engine.js"></script>
+<script src="js/ui/tictactoeScreen.js"></script>
+<script src="js/games/connect4/engine.js"></script>
+<script src="js/ui/connect4Screen.js"></script>
+<script src="js/games/chess/engine.js"></script>
+<script src="js/ui/chessScreen.js"></script>
+<script src="js/games/ludo/engine.js"></script>
+<script src="js/ui/ludoScreen.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
