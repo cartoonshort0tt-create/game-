@@ -5,12 +5,32 @@ Rock-Paper-Scissors, Coin Flip, and more, with a virtual coin economy,
 bot opponents, and cartoon-animated presentation. Built to be hostable
 as a static site on GitHub Pages.
 
-**Status:** Planning complete, implementation not started yet.
+**Status:** Milestone 1 complete — lobby, wallet, avatar profile, and a
+fully playable Rock-Paper-Scissors match vs. bots are live as a static
+site. Other games are stubbed as "Coming Soon" tiles for later milestones.
 
 See [`BLUEPRINT.md`](./BLUEPRINT.md) for the full advanced blueprint:
 product vision, game library, virtual economy design, architecture
 phases, tech stack, data model, repo structure, and the development
 roadmap.
+
+## Run it locally
+
+No build step or dependencies. From the repo root:
+
+```sh
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000` in a browser. (Opening `index.html`
+directly by double-clicking also works, since there are no ES modules —
+just plain scripts.)
+
+## Host it on GitHub Pages
+
+Repo Settings → Pages → Deploy from branch → pick this branch (or `main`)
+and the `/ (root)` folder. The site is 100% static (HTML/CSS/vanilla JS,
+localStorage for the wallet/profile), so no further setup is needed.
 
 ## Why no real-money wagering or camera matching?
 
@@ -25,6 +45,5 @@ this repo's scope.
 
 ## Next step
 
-Build Milestone 1 from the blueprint: landing page + lobby browser +
-wallet system + Rock-Paper-Scissors vs. bot, fully playable as a static
-site with no backend.
+Milestone 2 from the blueprint: add Coin Flip, Tic-Tac-Toe, and Connect 4,
+plus local hotseat mode, achievements, and offline/PWA support.
