@@ -5,9 +5,10 @@ Rock-Paper-Scissors, Coin Flip, and more, with a virtual coin economy,
 bot opponents, and cartoon-animated presentation. Built to be hostable
 as a static site on GitHub Pages.
 
-**Status:** Milestone 1 complete — lobby, wallet, avatar profile, and a
-fully playable Rock-Paper-Scissors match vs. bots are live as a static
-site. Other games are stubbed as "Coming Soon" tiles for later milestones.
+**Status:** Full game library live — Rock-Paper-Scissors, Coin Flip,
+Tic-Tac-Toe, Connect 4, Chess (full standard rules), and Ludo are all
+playable vs. tiered bots, on top of the wallet, avatar profile, and
+lobby system, entirely as a static site with no backend.
 
 See [`BLUEPRINT.md`](./BLUEPRINT.md) for the full advanced blueprint:
 product vision, game library, virtual economy design, architecture
@@ -45,5 +46,6 @@ this repo's scope.
 
 ## Next step
 
-Milestone 2 from the blueprint: add Coin Flip, Tic-Tac-Toe, and Connect 4,
-plus local hotseat mode, achievements, and offline/PWA support.
+Milestone 4+ from the blueprint: real online 1v1 matchmaking (Firebase),
+cross-device accounts, cosmetics store, tournaments, leaderboards, and
+offline/PWA support.
