@@ -78,6 +78,7 @@
   function botTurn() {
     if (match.over) return;
     var mv = match.bot.pickMove(match.state);
+    GA.Sfx.play(mv.captured ? 'capture' : 'move');
     match.state = C.applyMove(match.state, mv);
     match.locked = false;
     renderBoard();
@@ -102,6 +103,7 @@
   function tryMove(r, c) {
     var chosen = match.legalForSelected.find(function (m) { return m.to[0] === r && m.to[1] === c; });
     if (!chosen) { trySelect(r, c); return; }
+    GA.Sfx.play(chosen.captured ? 'capture' : 'move');
     match.state = C.applyMove(match.state, chosen);
     match.selected = null;
     match.legalForSelected = [];
@@ -120,6 +122,8 @@
       }
       tryMove(r, c);
     } else {
+      var piece = match.state.board[r][c];
+      if (piece && piece.color === C.WHITE) GA.Sfx.play('select');
       trySelect(r, c);
     }
   }

@@ -62,6 +62,12 @@
   padding: 8px 16px;
 }
 
+.sound-toggle-btn {
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  border: none;
+}
+
 .wallet-pill .coin-icon {
   font-size: 1.1rem;
 }
@@ -676,61 +682,68 @@
 .chess-piece-b { color: #1a1024; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.15); }
 
 .ludo-track {
-  margin: 22px 0;
-}
-
-.ludo-base-col, .ludo-home-col {
+  margin: 22px auto;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
+  justify-content: center;
 }
 
-.ludo-base-row {
-  display: flex;
-  gap: 6px;
-  min-height: 22px;
-}
-
-.ludo-home-badge {
-  background: rgba(212, 175, 55, 0.15);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #f2ecff;
-}
-
-.ludo-strip {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  padding: 8px;
-  background: linear-gradient(180deg, #241645, #170d2c);
+.ludo-grid {
+  --cell: 26px;
+  display: grid;
+  grid-template-columns: repeat(15, var(--cell));
+  grid-template-rows: repeat(15, var(--cell));
+  gap: 1px;
+  background: #0d0818;
   border-radius: var(--radius-md);
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3), inset 0 4px 14px rgba(0, 0, 0, 0.45);
+  padding: 6px;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.4), 0 12px 26px rgba(0, 0, 0, 0.45);
 }
 
-.ludo-cell {
-  flex: 0 0 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
+.ludo-gcell {
+  width: var(--cell);
+  height: var(--cell);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: 1px;
+  position: relative;
 }
 
-.ludo-cell-safe {
-  background: rgba(212, 175, 55, 0.18);
+.ludo-role-yard { background: rgba(255, 255, 255, 0.03); }
+.ludo-owner-P.ludo-role-yard { background: rgba(212, 175, 55, 0.16); }
+.ludo-owner-B.ludo-role-yard { background: rgba(139, 111, 219, 0.18); }
+
+.ludo-role-ring { background: #241645; }
+.ludo-role-ring.ludo-safe { background: rgba(212, 175, 55, 0.22); }
+
+.ludo-role-stretch { background: rgba(255, 255, 255, 0.05); }
+.ludo-role-stretch.ludo-owner-P { background: rgba(212, 175, 55, 0.32); }
+.ludo-role-stretch.ludo-owner-B { background: rgba(139, 111, 219, 0.34); }
+
+.ludo-role-center { background: #170d2c; }
+.ludo-role-hub {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.35), #170d2c 70%);
+  font-size: 12px;
+}
+
+.ludo-star {
+  color: rgba(212, 175, 55, 0.85);
+  font-size: 11px;
+  line-height: 1;
 }
 
 .ludo-token {
-  width: 16px;
-  height: 16px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   animation: piece-reveal 0.3s ease;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.ludo-token-mini {
+  width: 6px;
+  height: 6px;
 }
 
 .ludo-token-player {
@@ -742,9 +755,11 @@
 }
 
 .ludo-token-movable {
-  box-shadow: 0 0 0 2px #fff, 0 0 10px 3px rgba(212, 175, 55, 0.8);
+  box-shadow: 0 0 0 1px #fff, 0 0 6px 2px rgba(212, 175, 55, 0.9);
   cursor: pointer;
   animation: victory-glow-pulse 0.8s ease-in-out infinite;
+  width: 12px;
+  height: 12px;
 }
 
 .ludo-controls {
@@ -758,6 +773,12 @@
 .ludo-die {
   font-size: 2.4rem;
   color: var(--accent);
+  min-width: 1.4em;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .ludo-grid { --cell: 18px; }
 }
 
 .rps-quit {

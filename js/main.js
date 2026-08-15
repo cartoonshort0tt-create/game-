@@ -62,7 +62,7 @@
         '<button class="btn ' + (playable ? 'btn-primary' : 'btn-secondary') + '" ' + (playable ? '' : 'disabled') + '>' +
         (playable ? 'Play' : 'Locked') + '</button>';
       if (playable) {
-        card.querySelector('button').addEventListener('click', function () { openStakeModal(g.id); });
+        card.querySelector('button').addEventListener('click', function () { GA.Sfx.play('open'); openStakeModal(g.id); });
       }
       grid.appendChild(card);
     });
@@ -228,7 +228,7 @@
       var firstWin = GA.Wallet.claimFirstWinBonusIfAvailable();
       if (firstWin) {
         delta += firstWin;
-        setTimeout(function () { showToast('🎉 First win of the day! +' + firstWin + ' bonus coins'); }, 600);
+        setTimeout(function () { GA.Sfx.play('notify'); showToast('🎉 First win of the day! +' + firstWin + ' bonus coins'); }, 600);
       }
     } else if (outcome === 'draw') {
       if (stake > 0) {
@@ -266,17 +266,22 @@
 
     $('resultsOverlay').classList.remove('hidden');
     if (outcome === 'win') {
+      GA.Sfx.play('win');
+      if (delta > 0) setTimeout(function () { GA.Sfx.play('coin'); }, 550);
       GA.Confetti.burst($('confettiLayer'), 70);
       var flash = document.createElement('div');
       flash.className = 'screen-flash';
       document.body.appendChild(flash);
       setTimeout(function () { flash.remove(); }, 700);
     } else if (outcome === 'loss') {
+      GA.Sfx.play('lose');
       $('resultsOverlay').querySelector('.modal-card').classList.add('shake-in');
       setTimeout(function () {
         var card = $('resultsOverlay').querySelector('.modal-card');
         if (card) card.classList.remove('shake-in');
       }, 500);
+    } else {
+      GA.Sfx.play('draw');
     }
   }
 
@@ -293,29 +298,42 @@
 
   /* ---------------- Event wiring ---------------- */
 
-  function wireEvents() {
-    $('profilePillBtn').addEventListener('click', openAvatarModal);
-    $('avatarCloseBtn').addEventListener('click', function () { $('avatarOverlay').classList.add('hidden'); });
-    $('saveProfileBtn').addEventListener('click', saveProfileFromModal);
+  function updateSoundToggleIcon() {
+    $('soundToggleIcon').textContent = GA.Sfx.isMuted() ? '🔇' : '🔊';
+  }
 
-    $('stakeCloseBtn').addEventListener('click', function () { $('stakeOverlay').classList.add('hidden'); });
+  function wireEvents() {
+    $('soundToggleBtn').addEventListener('click', function () {
+      GA.Sfx.toggleMuted();
+      updateSoundToggleIcon();
+      GA.Sfx.play('click');
+    });
+
+    $('profilePillBtn').addEventListener('click', function () { GA.Sfx.play('open'); openAvatarModal(); });
+    $('avatarCloseBtn').addEventListener('click', function () { GA.Sfx.play('click'); $('avatarOverlay').classList.add('hidden'); });
+    $('saveProfileBtn').addEventListener('click', function () { GA.Sfx.play('click'); saveProfileFromModal(); });
+
+    $('stakeCloseBtn').addEventListener('click', function () { GA.Sfx.play('click'); $('stakeOverlay').classList.add('hidden'); });
     $('tierRow').addEventListener('click', function (e) {
       var chip = e.target.closest('.chip');
       if (!chip) return;
+      GA.Sfx.play('select');
       state.selectedTier = chip.dataset.tier;
       $('tierRow').querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('selected', c === chip); });
     });
     $('stakeRow').addEventListener('click', function (e) {
       var chip = e.target.closest('.chip');
       if (!chip) return;
+      GA.Sfx.play('select');
       state.selectedStake = Number(chip.dataset.stake);
       $('stakeRow').querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('selected', c === chip); });
       updateStakeBalanceNote();
     });
-    $('startMatchBtn').addEventListener('click', startMatch);
+    $('startMatchBtn').addEventListener('click', function () { GA.Sfx.play('click'); startMatch(); });
 
-    $('resultsLobbyBtn').addEventListener('click', function () { $('resultsOverlay').classList.add('hidden'); });
+    $('resultsLobbyBtn').addEventListener('click', function () { GA.Sfx.play('click'); $('resultsOverlay').classList.add('hidden'); });
     $('resultsAgainBtn').addEventListener('click', function () {
+      GA.Sfx.play('click');
       $('resultsOverlay').classList.add('hidden');
       openStakeModal(state.activeGame);
     });
@@ -327,9 +345,11 @@
     renderHeader();
     renderGameGrid();
     wireEvents();
+    updateSoundToggleIcon();
     var bonus = GA.Wallet.claimDailyBonusIfAvailable();
     if (bonus) {
       renderHeader();
+      setTimeout(function () { GA.Sfx.play('notify'); }, 300);
       showToast('☀️ Daily bonus! +' + bonus + ' coins');
     }
   }

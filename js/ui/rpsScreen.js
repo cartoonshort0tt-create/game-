@@ -80,6 +80,7 @@
       pHand.className = 'rps-hand reveal-flip';
       bHand.className = 'rps-hand reveal-flip';
       $('rpsArena').classList.add('impact-shake');
+      GA.Sfx.play('reveal');
       setTimeout(function () { $('rpsArena').classList.remove('impact-shake'); }, 360);
 
       var outcome = GA.RPS.judgeRound(playerChoice, botChoice);
@@ -139,6 +140,7 @@
     $('rpsChoiceRow').addEventListener('click', function (e) {
       var btn = e.target.closest('.choice-btn');
       if (!btn || btn.disabled) return;
+      GA.Sfx.play('select');
       playRound(btn.dataset.choice);
     });
     $('rpsForfeitBtn').addEventListener('click', forfeitMatch);

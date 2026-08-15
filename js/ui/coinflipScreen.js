@@ -50,11 +50,13 @@
     disc.className = 'coin-disc spinning';
     resultText.textContent = 'Flipping…';
     resultText.className = 'round-result-text cadence';
+    GA.Sfx.play('flip');
 
     setTimeout(function () {
       var landed = GA.CoinFlip.flip();
       disc.className = 'coin-disc landed-' + landed;
       setCoinFace(landed);
+      GA.Sfx.play('reveal');
 
       var playerCorrect = call === landed;
       if (playerCorrect) {
@@ -100,6 +102,7 @@
     $('coinflipChoiceRow').addEventListener('click', function (e) {
       var btn = e.target.closest('.choice-btn');
       if (!btn || btn.disabled) return;
+      GA.Sfx.play('select');
       playRound(btn.dataset.call);
     });
     $('coinflipForfeitBtn').addEventListener('click', forfeitMatch);

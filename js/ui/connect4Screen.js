@@ -79,6 +79,7 @@
     match.locked = false;
     var col = match.bot.pickColumn(match.grid);
     C4.dropPiece(match.grid, col, C4.BOT);
+    GA.Sfx.play('place');
     if (afterMove()) return;
     match.turn = C4.PLAYER;
     setStatus('Your turn — pick a column');
@@ -89,6 +90,7 @@
     if (!match || match.over || match.locked || match.turn !== C4.PLAYER) return;
     if (match.grid[0][col]) return;
     C4.dropPiece(match.grid, col, C4.PLAYER);
+    GA.Sfx.play('place');
     if (afterMove()) return;
     match.turn = C4.BOT;
     match.locked = true;

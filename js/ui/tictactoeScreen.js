@@ -72,6 +72,7 @@
     if (match.over) return;
     var idx = match.bot.pickMove(match.board);
     match.board[idx] = T.BOT;
+    GA.Sfx.play('place');
     if (afterMove()) return;
     match.turn = T.PLAYER;
     setStatus('Your turn — place your mark');
@@ -81,6 +82,7 @@
   function playerMove(idx) {
     if (!match || match.over || match.turn !== T.PLAYER || match.board[idx]) return;
     match.board[idx] = T.PLAYER;
+    GA.Sfx.play('place');
     if (afterMove()) return;
     match.turn = T.BOT;
     setStatus(match.bot.name + ' is thinking…');

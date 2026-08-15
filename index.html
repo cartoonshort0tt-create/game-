@@ -61,6 +61,9 @@
   <header class="app-header">
     <div class="brand"><span class="logo">🎮</span> GameArena</div>
     <div class="header-right">
+      <button class="pill sound-toggle-btn" id="soundToggleBtn" title="Toggle sound">
+        <span id="soundToggleIcon">🔊</span>
+      </button>
       <button class="pill" id="profilePillBtn" title="Edit profile">
         <span class="pill-avatar" id="profileAvatarIcon" style="background:#eee;">🦊</span>
         <span id="profileNameLabel">Player</span>
@@ -285,6 +288,7 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="js/core/bootstrap.js"></script>
+<script src="js/core/sfx.js"></script>
 <script src="js/core/wallet.js"></script>
 <script src="js/core/profile.js"></script>
 <script src="js/core/matchHistory.js"></script>
