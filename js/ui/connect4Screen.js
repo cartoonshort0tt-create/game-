@@ -106,6 +106,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('connect4'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('connect4');
+  }
+
   function finish(outcome) {
     var scoreLine = outcome === 'draw' ? 'Board filled — no winner' : (outcome === 'win' ? 'You connected four' : 'Your opponent connected four');
     GA.Arena.finishMatch('connect4', match.bot, match.stake, outcome, scoreLine);
@@ -118,6 +126,7 @@
       playerDrop(Number(cell.dataset.col));
     });
     $('c4ForfeitBtn').addEventListener('click', forfeitMatch);
+    $('c4BackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.connect4 = {

@@ -97,6 +97,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('tictactoe'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('tictactoe');
+  }
+
   function finish(outcome) {
     var scoreLine = outcome === 'draw' ? 'Board filled — no winner' : (outcome === 'win' ? 'You got three in a row' : 'Your opponent got three in a row');
     GA.Arena.finishMatch('tictactoe', match.bot, match.stake, outcome, scoreLine);
@@ -109,6 +117,7 @@
       playerMove(Number(btn.dataset.idx));
     });
     $('tttForfeitBtn').addEventListener('click', forfeitMatch);
+    $('tttBackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.tictactoe = {

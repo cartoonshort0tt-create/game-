@@ -340,6 +340,23 @@
 }
 
 /* ---------- RPS game screen ---------- */
+.screen-back-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2ecff;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 999px;
+  padding: 7px 16px 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.screen-back-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  transform: translateX(-2px);
+}
+
 .rps-screen {
   background: linear-gradient(180deg, #1c1032, #120a24);
   border-radius: var(--radius-lg);

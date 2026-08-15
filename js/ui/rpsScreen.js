@@ -126,6 +126,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('rps'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('rps');
+  }
+
   function finish(outcome) {
     if (!match || match.over) return;
     match.over = true;
@@ -144,6 +152,7 @@
       playRound(btn.dataset.choice);
     });
     $('rpsForfeitBtn').addEventListener('click', forfeitMatch);
+    $('rpsBackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.rps = {

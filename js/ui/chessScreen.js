@@ -135,6 +135,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('chess'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('chess');
+  }
+
   function finish(outcome) {
     var scoreLine = outcome === 'draw' ? 'Stalemate' : (outcome === 'win' ? 'Checkmate delivered' : 'Checkmated');
     GA.Arena.finishMatch('chess', match.bot, match.stake, outcome, scoreLine);
@@ -147,6 +155,7 @@
       onSquareClick(Number(sq.dataset.r), Number(sq.dataset.c));
     });
     $('chessForfeitBtn').addEventListener('click', forfeitMatch);
+    $('chessBackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.chess = {

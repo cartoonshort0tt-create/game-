@@ -91,6 +91,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('coinflip'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('coinflip');
+  }
+
   function finish(outcome) {
     if (!match || match.over) return;
     match.over = true;
@@ -106,6 +114,7 @@
       playRound(btn.dataset.call);
     });
     $('coinflipForfeitBtn').addEventListener('click', forfeitMatch);
+    $('coinflipBackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.coinflip = {

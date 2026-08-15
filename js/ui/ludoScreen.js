@@ -248,6 +248,14 @@
     finish('loss');
   }
 
+  function handleBack() {
+    if (!match || match.over) { GA.Arena.backToLobby('ludo'); return; }
+    if (match.stake > 0) { forfeitMatch(); return; }
+    match.over = true;
+    GA.Sfx.play('click');
+    GA.Arena.backToLobby('ludo');
+  }
+
   function finish(outcome) {
     var scoreLine = outcome === 'win' ? 'All 4 tokens home first' : 'Rival got all 4 tokens home first';
     GA.Arena.finishMatch('ludo', match.bot, match.stake, outcome, scoreLine);
@@ -261,6 +269,7 @@
       onTokenClick(tok.dataset.color, Number(tok.dataset.tokenIdx));
     });
     $('ludoForfeitBtn').addEventListener('click', forfeitMatch);
+    $('ludoBackBtn').addEventListener('click', handleBack);
   });
 
   GA.Games.ludo = {
