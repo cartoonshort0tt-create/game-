@@ -12,7 +12,8 @@
   --radius-lg: 22px;
   --radius-md: 14px;
   --shadow-card: 0 10px 0 rgba(42, 30, 63, 0.9), 0 14px 24px rgba(0, 0, 0, 0.35);
-  --font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Cinzel', 'Segoe UI', serif;
 }
 
 * {

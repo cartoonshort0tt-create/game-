@@ -2,7 +2,6 @@
   'use strict';
 
   var CHOICES = ['rock', 'paper', 'scissors'];
-  var EMOJI = { rock: '🪨', paper: '📄', scissors: '✂️' };
 
   function beats(a, b) {
     return (a === 'rock' && b === 'scissors') ||
@@ -57,7 +56,6 @@
 
   GA.RPS = {
     CHOICES: CHOICES,
-    EMOJI: EMOJI,
     BOT_PROFILES: BOT_PROFILES,
     beats: beats,
     createBot: createBot,

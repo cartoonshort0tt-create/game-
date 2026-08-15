@@ -238,11 +238,17 @@
     document.getElementById('screenRps').classList.remove('hidden');
   }
 
+  function renderChoiceButtons() {
+    $('rpsChoiceRow').querySelectorAll('.choice-btn').forEach(function (btn) {
+      btn.innerHTML = GA.Icons[btn.dataset.choice]();
+    });
+  }
+
   function resetHands() {
     var pHand = $('rpsPlayerHand');
     var bHand = $('rpsBotHand');
-    pHand.textContent = '✊';
-    bHand.textContent = '✊';
+    pHand.innerHTML = GA.Icons.idle();
+    bHand.innerHTML = GA.Icons.idle();
     pHand.className = 'rps-hand';
     bHand.className = 'rps-hand';
   }
@@ -253,44 +259,60 @@
     });
   }
 
+  var CADENCE_WORDS = ['Rock…', 'Paper…', 'Scissors…', 'Shoot!'];
+
   function playRound(playerChoice) {
     if (!state.match || state.match.over) return;
     setChoiceButtonsEnabled(false);
 
     var pHand = $('rpsPlayerHand');
     var bHand = $('rpsBotHand');
-    pHand.classList.add('shaking');
-    bHand.classList.add('shaking');
-    $('rpsRoundResultText').textContent = 'Rock... Paper... Scissors...';
-    $('rpsRoundResultText').className = 'round-result-text';
+    var resultText = $('rpsRoundResultText');
+    pHand.classList.add('charging');
+    bHand.classList.add('charging');
+
+    var wordIndex = 0;
+    resultText.textContent = CADENCE_WORDS[wordIndex];
+    resultText.className = 'round-result-text cadence';
+    var cadenceTimer = setInterval(function () {
+      wordIndex++;
+      if (wordIndex < CADENCE_WORDS.length) resultText.textContent = CADENCE_WORDS[wordIndex];
+    }, 260);
 
     setTimeout(function () {
-      pHand.classList.remove('shaking');
-      bHand.classList.remove('shaking');
+      clearInterval(cadenceTimer);
+      pHand.classList.remove('charging');
+      bHand.classList.remove('charging');
 
       var bot = state.match.bot;
       var botChoice = bot.nextMove();
       bot.recordPlayerChoice(playerChoice);
 
-      pHand.textContent = GA.RPS.EMOJI[playerChoice];
-      bHand.textContent = GA.RPS.EMOJI[botChoice];
+      pHand.innerHTML = GA.Icons[playerChoice]();
+      bHand.innerHTML = GA.Icons[botChoice]();
+      pHand.className = 'rps-hand reveal-flip';
+      bHand.className = 'rps-hand reveal-flip';
+      $('rpsArena').classList.add('impact-shake');
+      setTimeout(function () { $('rpsArena').classList.remove('impact-shake'); }, 360);
 
       var outcome = GA.RPS.judgeRound(playerChoice, botChoice);
       if (outcome === 'player') {
         state.match.playerWins++;
-        pHand.className = 'rps-hand reveal-win';
-        bHand.className = 'rps-hand reveal-lose';
-        $('rpsRoundResultText').textContent = capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!';
-        $('rpsRoundResultText').className = 'round-result-text win';
+        pHand.className = 'rps-hand reveal-flip glow-win';
+        bHand.className = 'rps-hand reveal-flip glow-lose';
+        resultText.textContent = capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!';
+        resultText.className = 'round-result-text win';
       } else if (outcome === 'bot') {
         state.match.botWins++;
-        pHand.className = 'rps-hand reveal-lose';
-        bHand.className = 'rps-hand reveal-win';
-        $('rpsRoundResultText').textContent = capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.';
-        $('rpsRoundResultText').className = 'round-result-text lose';
+        pHand.className = 'rps-hand reveal-flip glow-lose';
+        bHand.className = 'rps-hand reveal-flip glow-win';
+        resultText.textContent = capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.';
+        resultText.className = 'round-result-text lose';
       } else {
-        $('rpsRoundResultText').textContent = 'Both chose ' + playerChoice + ' — draw, replay the round.';
-        $('rpsRoundResultText').className = 'round-result-text draw';
+        pHand.className = 'rps-hand reveal-flip glow-draw';
+        bHand.className = 'rps-hand reveal-flip glow-draw';
+        resultText.textContent = 'Both chose ' + playerChoice + ' — draw, replay the round.';
+        resultText.className = 'round-result-text draw';
       }
 
       renderDots($('rpsPlayerDots'), state.match.playerWins);
@@ -302,12 +324,12 @@
           finishMatch(state.match.playerWins >= WIN_TARGET ? 'win' : 'loss');
         } else {
           resetHands();
-          $('rpsRoundResultText').textContent = 'Make your move!';
-          $('rpsRoundResultText').className = 'round-result-text';
+          resultText.textContent = 'Make your move!';
+          resultText.className = 'round-result-text';
           setChoiceButtonsEnabled(true);
         }
-      }, 1400);
-    }, 900);
+      }, 1500);
+    }, 1100);
   }
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -355,7 +377,7 @@
     document.getElementById('screenRps').classList.add('hidden');
     document.getElementById('screenLobby').classList.remove('hidden');
 
-    $('resultsEmoji').textContent = outcome === 'win' ? '🏆' : '😅';
+    $('resultsEmoji').innerHTML = outcome === 'win' ? GA.Icons.trophy() : GA.Icons.brokenStone();
     var title = $('resultsTitle');
     title.textContent = outcome === 'win' ? 'You Win!' : 'You Lost';
     title.className = 'results-title ' + (outcome === 'win' ? 'win' : 'lose');
@@ -373,6 +395,16 @@
     $('resultsOverlay').classList.remove('hidden');
     if (outcome === 'win') {
       GA.Confetti.burst($('confettiLayer'), 70);
+      var flash = document.createElement('div');
+      flash.className = 'screen-flash';
+      document.body.appendChild(flash);
+      setTimeout(function () { flash.remove(); }, 700);
+    } else {
+      $('resultsOverlay').querySelector('.modal-card').classList.add('shake-in');
+      setTimeout(function () {
+        var card = $('resultsOverlay').querySelector('.modal-card');
+        if (card) card.classList.remove('shake-in');
+      }, 500);
     }
   }
 
@@ -418,6 +450,7 @@
   function boot() {
     renderHeader();
     renderGameGrid();
+    renderChoiceButtons();
     wireEvents();
     var bonus = GA.Wallet.claimDailyBonusIfAvailable();
     if (bonus) {

@@ -6,11 +6,55 @@
 <title>GameArena — 1v1 Game Lobby</title>
 <meta name="description" content="Compete 1v1 in classic games with a virtual coin economy, bots, and cartoon-animated matches." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/base.css" />
 <link rel="stylesheet" href="css/theme.css" />
 <link rel="stylesheet" href="css/animations.css" />
 </head>
 <body>
+
+<!-- Shared gradient/filter definitions for the fantasy-styled game-piece icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b7a488"/>
+      <stop offset="55%" stop-color="#8a725a"/>
+      <stop offset="100%" stop-color="#5c4a38"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdecb0"/>
+      <stop offset="50%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#8a6a1f"/>
+    </linearGradient>
+    <linearGradient id="parchmentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8efd6"/>
+      <stop offset="100%" stop-color="#e6d3a3"/>
+    </linearGradient>
+    <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e7defe"/>
+      <stop offset="50%" stop-color="#a795e0"/>
+      <stop offset="100%" stop-color="#5c4aa0"/>
+    </linearGradient>
+    <linearGradient id="crackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0554f"/>
+      <stop offset="100%" stop-color="#7a1f1a"/>
+    </linearGradient>
+    <linearGradient id="trophyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff3c4"/>
+      <stop offset="55%" stop-color="#e8b923"/>
+      <stop offset="100%" stop-color="#a97a0c"/>
+    </linearGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
 
 <div class="app-shell">
 
@@ -51,15 +95,15 @@
 
       <div class="round-result-text" id="rpsRoundResultText"></div>
 
-      <div class="rps-arena">
-        <div class="rps-hand" id="rpsPlayerHand">✊</div>
-        <div class="rps-hand" id="rpsBotHand">✊</div>
+      <div class="rps-arena" id="rpsArena">
+        <div class="rps-hand" id="rpsPlayerHand"></div>
+        <div class="rps-hand" id="rpsBotHand"></div>
       </div>
 
       <div class="choice-row" id="rpsChoiceRow">
-        <button class="choice-btn" data-choice="rock" title="Rock">🪨</button>
-        <button class="choice-btn" data-choice="paper" title="Paper">📄</button>
-        <button class="choice-btn" data-choice="scissors" title="Scissors">✂️</button>
+        <button class="choice-btn" data-choice="rock" title="Rock"></button>
+        <button class="choice-btn" data-choice="paper" title="Paper"></button>
+        <button class="choice-btn" data-choice="scissors" title="Scissors"></button>
       </div>
 
       <button class="rps-quit" id="rpsForfeitBtn">Forfeit match</button>
@@ -134,7 +178,7 @@
 <!-- Results overlay -->
 <div class="overlay hidden" id="resultsOverlay">
   <div class="modal-card results-card">
-    <div class="results-emoji" id="resultsEmoji">🏆</div>
+    <div class="results-emoji" id="resultsEmoji"></div>
     <div class="results-title" id="resultsTitle">You Win!</div>
     <div id="resultsScoreLine" style="color:var(--ink-soft);font-weight:700;"></div>
     <div class="coin-delta" id="resultsCoinDelta"></div>
@@ -152,6 +196,7 @@
 <script src="js/core/profile.js"></script>
 <script src="js/core/matchHistory.js"></script>
 <script src="js/games/rps/engine.js"></script>
+<script src="js/ui/icons.js"></script>
 <script src="js/ui/confetti.js"></script>
 <script src="js/main.js"></script>
 </body>
