@@ -4,45 +4,55 @@
   var $ = GA.$;
   var WIN_TARGET = 3;
   var CADENCE_WORDS = ['Rock…', 'Paper…', 'Scissors…', 'Shoot!'];
-  var match = null; // { bot, stake, playerWins, botWins, over }
+  var HAND_EMOJI = { rock: '✊', paper: '🖐️', scissors: '✌️' };
+  var CHOICES = ['rock', 'paper', 'scissors'];
+  var match = null; // { bot, stake, playerWins, botWins, roundsPlayed, draws, over }
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  function renderDots(container, wins) {
-    container.innerHTML = '';
-    for (var i = 0; i < WIN_TARGET; i++) {
-      var dot = document.createElement('span');
-      dot.className = 'score-dot' + (i < wins ? ' filled' : '');
-      container.appendChild(dot);
-    }
+  function setTagline(text, cls) {
+    var el = $('rpsRoundResultText');
+    el.textContent = text;
+    el.className = 'neon-tagline round-result-text' + (cls ? ' ' + cls : '');
   }
 
-  function resetHands() {
-    var pHand = $('rpsPlayerHand');
-    var bHand = $('rpsBotHand');
-    pHand.innerHTML = GA.Icons.idle();
-    bHand.innerHTML = GA.Icons.idle();
-    pHand.className = 'rps-hand';
-    bHand.className = 'rps-hand';
+  function updateScoreNums() {
+    $('rpsPlayerScoreNum').textContent = match.playerWins;
+    $('rpsBotScoreNum').textContent = match.botWins;
+  }
+
+  function updateStatsPanel() {
+    $('rpsStatRounds').textContent = match.roundsPlayed;
+    $('rpsStatWins').textContent = match.playerWins;
+    $('rpsStatLosses').textContent = match.botWins;
+    $('rpsStatDraws').textContent = match.draws;
+  }
+
+  function resetOrbs() {
+    var pOrb = $('rpsPlayerOrb');
+    var bOrb = $('rpsBotOrb');
+    pOrb.className = 'neon-orb neon-blue-orb';
+    bOrb.className = 'neon-orb neon-red-orb';
+    $('rpsPlayerHand').textContent = '✊';
+    $('rpsBotHand').textContent = '✊';
   }
 
   function setChoiceButtonsEnabled(enabled) {
-    $('rpsChoiceRow').querySelectorAll('.choice-btn').forEach(function (btn) { btn.disabled = !enabled; });
+    $('rpsChoiceRow').querySelectorAll('.neon-choice-btn').forEach(function (btn) { btn.disabled = !enabled; });
   }
 
   function begin(bot, stake) {
     var profile = GA.Profile.get();
-    match = { bot: bot, stake: stake, playerWins: 0, botWins: 0, over: false };
+    match = { bot: bot, stake: stake, playerWins: 0, botWins: 0, roundsPlayed: 0, draws: 0, over: false };
 
     $('rpsPlayerIcon').textContent = profile.avatar.emoji;
     $('rpsPlayerNameLabel').textContent = profile.displayName;
     $('rpsBotIcon').textContent = bot.emoji;
     $('rpsBotNameLabel').textContent = bot.name;
-    renderDots($('rpsPlayerDots'), 0);
-    renderDots($('rpsBotDots'), 0);
-    $('rpsRoundResultText').textContent = 'Make your move!';
-    $('rpsRoundResultText').className = 'round-result-text';
-    resetHands();
+    updateScoreNums();
+    updateStatsPanel();
+    setTagline('Make Your Move!');
+    resetOrbs();
     setChoiceButtonsEnabled(true);
 
     document.getElementById('screenRps').classList.remove('hidden');
@@ -52,83 +62,88 @@
     if (!match || match.over) return;
     setChoiceButtonsEnabled(false);
 
+    var pOrb = $('rpsPlayerOrb');
+    var bOrb = $('rpsBotOrb');
     var pHand = $('rpsPlayerHand');
     var bHand = $('rpsBotHand');
-    var resultText = $('rpsRoundResultText');
-    pHand.classList.add('charging');
-    bHand.classList.add('charging');
+    pOrb.classList.add('charging');
+    bOrb.classList.add('charging');
 
     var wordIndex = 0;
-    resultText.textContent = CADENCE_WORDS[wordIndex];
-    resultText.className = 'round-result-text cadence';
+    setTagline(CADENCE_WORDS[wordIndex], 'cadence');
     var cadenceTimer = setInterval(function () {
       wordIndex++;
-      if (wordIndex < CADENCE_WORDS.length) resultText.textContent = CADENCE_WORDS[wordIndex];
+      if (wordIndex < CADENCE_WORDS.length) setTagline(CADENCE_WORDS[wordIndex], 'cadence');
     }, 260);
 
-    // Rapidly cycle both hands through random choices to build suspense before the real reveal.
     var shuffleTimer = setInterval(function () {
-      pHand.innerHTML = GA.Icons[GA.RPS.CHOICES[Math.floor(Math.random() * 3)]]();
-      bHand.innerHTML = GA.Icons[GA.RPS.CHOICES[Math.floor(Math.random() * 3)]]();
+      pHand.textContent = HAND_EMOJI[CHOICES[Math.floor(Math.random() * 3)]];
+      bHand.textContent = HAND_EMOJI[CHOICES[Math.floor(Math.random() * 3)]];
       GA.Sfx.play('shuffle');
     }, 90);
 
     setTimeout(function () {
       clearInterval(cadenceTimer);
       clearInterval(shuffleTimer);
-      pHand.classList.remove('charging');
-      bHand.classList.remove('charging');
+      pOrb.classList.remove('charging');
+      bOrb.classList.remove('charging');
 
       var bot = match.bot;
       var botChoice = bot.nextMove();
       bot.recordPlayerChoice(playerChoice);
 
-      pHand.innerHTML = GA.Icons[playerChoice]();
-      bHand.innerHTML = GA.Icons[botChoice]();
-      pHand.className = 'rps-hand reveal-flip';
-      bHand.className = 'rps-hand reveal-flip';
+      pHand.textContent = HAND_EMOJI[playerChoice];
+      bHand.textContent = HAND_EMOJI[botChoice];
+      pOrb.className = 'neon-orb neon-blue-orb reveal';
+      bOrb.className = 'neon-orb neon-red-orb reveal';
       $('rpsArena').classList.add('impact-shake');
       GA.Sfx.play('reveal');
       setTimeout(function () { $('rpsArena').classList.remove('impact-shake'); }, 360);
 
+      match.roundsPlayed++;
       var outcome = GA.RPS.judgeRound(playerChoice, botChoice);
       if (outcome === 'player') {
         match.playerWins++;
-        pHand.className = 'rps-hand reveal-flip glow-win';
-        bHand.className = 'rps-hand reveal-flip glow-lose';
-        resultText.textContent = capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!';
-        resultText.className = 'round-result-text win';
+        pOrb.className = 'neon-orb neon-blue-orb glow-win';
+        bOrb.className = 'neon-orb neon-red-orb glow-lose';
+        setTagline(capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!', 'win');
         GA.Arena.showToast('🔥 Nice throw!');
       } else if (outcome === 'bot') {
         match.botWins++;
-        pHand.className = 'rps-hand reveal-flip glow-lose';
-        bHand.className = 'rps-hand reveal-flip glow-win';
-        resultText.textContent = capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.';
-        resultText.className = 'round-result-text lose';
+        pOrb.className = 'neon-orb neon-blue-orb glow-lose';
+        bOrb.className = 'neon-orb neon-red-orb glow-win';
+        setTagline(capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.', 'lose');
         GA.Arena.showToast('💥 ' + match.bot.name + ' takes the round');
       } else {
-        pHand.className = 'rps-hand reveal-flip glow-draw';
-        bHand.className = 'rps-hand reveal-flip glow-draw';
-        resultText.textContent = 'Both chose ' + playerChoice + ' — draw, replay the round.';
-        resultText.className = 'round-result-text draw';
+        match.draws++;
+        pOrb.className = 'neon-orb neon-blue-orb glow-draw';
+        bOrb.className = 'neon-orb neon-red-orb glow-draw';
+        setTagline('Both chose ' + playerChoice + ' — draw, replay the round.', 'draw');
         GA.Arena.showToast('🤝 Draw — go again');
       }
 
-      renderDots($('rpsPlayerDots'), match.playerWins);
-      renderDots($('rpsBotDots'), match.botWins);
+      updateScoreNums();
+      updateStatsPanel();
 
       var matchOver = match.playerWins >= WIN_TARGET || match.botWins >= WIN_TARGET;
       setTimeout(function () {
         if (matchOver) {
           finish(match.playerWins >= WIN_TARGET ? 'win' : 'loss');
         } else {
-          resetHands();
-          resultText.textContent = 'Make your move!';
-          resultText.className = 'round-result-text';
+          resetOrbs();
+          setTagline('Make your move!');
           setChoiceButtonsEnabled(true);
         }
       }, 1500);
     }, 1100);
+  }
+
+  function quickPlay() {
+    if (!match || match.over) return;
+    var busy = $('rpsChoiceRow').querySelector('.neon-choice-btn').disabled;
+    if (busy) return;
+    GA.Sfx.play('select');
+    playRound(CHOICES[Math.floor(Math.random() * 3)]);
   }
 
   function forfeitMatch() {
@@ -153,15 +168,13 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    $('rpsChoiceRow').querySelectorAll('.choice-btn').forEach(function (btn) {
-      btn.innerHTML = GA.Icons[btn.dataset.choice]();
-    });
     $('rpsChoiceRow').addEventListener('click', function (e) {
-      var btn = e.target.closest('.choice-btn');
+      var btn = e.target.closest('.neon-choice-btn');
       if (!btn || btn.disabled) return;
       GA.Sfx.play('select');
       playRound(btn.dataset.choice);
     });
+    $('rpsQuickPlayBtn').addEventListener('click', quickPlay);
     $('rpsForfeitBtn').addEventListener('click', forfeitMatch);
     $('rpsBackBtn').addEventListener('click', handleBack);
   });

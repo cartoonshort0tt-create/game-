@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/base.css" />
 <link rel="stylesheet" href="css/theme.css" />
 <link rel="stylesheet" href="css/animations.css" />
+<link rel="stylesheet" href="css/neon-rps.css" />
 </head>
 <body>
 
@@ -81,36 +82,66 @@
   </main>
 
   <section id="screenRps" class="hidden">
-    <div class="rps-screen">
+    <div class="neon-rps-screen">
       <button class="screen-back-btn" id="rpsBackBtn">← Back to Lobby</button>
-      <div class="rps-scoreboard">
-        <div class="rps-player-tag">
-          <span id="rpsPlayerIcon">🦊</span>
-          <span id="rpsPlayerNameLabel">You</span>
-          <span class="score-dots" id="rpsPlayerDots"></span>
+
+      <div class="neon-topbar">
+        <div class="neon-score-card neon-player-card">
+          <div class="neon-avatar" id="rpsPlayerIcon">🦊</div>
+          <div class="neon-score-info"><span id="rpsPlayerNameLabel">You</span><strong id="rpsPlayerScoreNum">0</strong></div>
         </div>
-        <div class="rps-vs-label">VS</div>
-        <div class="rps-player-tag">
-          <span class="score-dots" id="rpsBotDots"></span>
-          <span id="rpsBotNameLabel">Bot</span>
-          <span id="rpsBotIcon">🐣</span>
+        <div class="neon-logo">
+          <div class="neon-logo-title"><span>ROCK</span><i>•</i><b>PAPER</b><i>•</i><em>SCISSORS</em></div>
+          <div class="neon-tagline round-result-text" id="rpsRoundResultText">Make Your Move!</div>
+        </div>
+        <div class="neon-score-card neon-bot-card">
+          <div class="neon-score-info neon-score-info-right"><span id="rpsBotNameLabel">Bot</span><strong id="rpsBotScoreNum">0</strong></div>
+          <div class="neon-avatar" id="rpsBotIcon">🐣</div>
         </div>
       </div>
 
-      <div class="round-result-text" id="rpsRoundResultText"></div>
+      <div class="neon-layout">
+        <aside class="neon-panel neon-rules">
+          <h3>💡 Game Rules</h3>
+          <div class="neon-rule"><b>🪨</b><span><strong>Rock</strong><small>beats Scissors ✂️</small></span></div>
+          <div class="neon-rule"><b>📄</b><span><strong>Paper</strong><small>beats Rock 🪨</small></span></div>
+          <div class="neon-rule"><b>✂️</b><span><strong>Scissors</strong><small>beats Paper 📄</small></span></div>
+        </aside>
 
-      <div class="rps-arena" id="rpsArena">
-        <div class="rps-hand" id="rpsPlayerHand"></div>
-        <div class="rps-hand" id="rpsBotHand"></div>
+        <div class="neon-arena">
+          <div class="neon-battle" id="rpsArena">
+            <div class="neon-choice-side">
+              <div class="neon-ribbon neon-blue">YOU CHOSE</div>
+              <div class="neon-orb neon-blue-orb" id="rpsPlayerOrb"><div class="neon-hand" id="rpsPlayerHand">✊</div></div>
+            </div>
+            <div class="neon-versus"><div>VS</div></div>
+            <div class="neon-choice-side">
+              <div class="neon-ribbon neon-red">RIVAL CHOSE</div>
+              <div class="neon-orb neon-red-orb" id="rpsBotOrb"><div class="neon-hand" id="rpsBotHand">✊</div></div>
+            </div>
+          </div>
+
+          <div class="neon-choose-title">Choose Your Move</div>
+          <div class="neon-choices" id="rpsChoiceRow">
+            <button class="neon-choice-btn neon-rock" data-choice="rock"><span class="neon-big-hand">✊</span><span>🪨 ROCK</span></button>
+            <button class="neon-choice-btn neon-paper" data-choice="paper"><span class="neon-big-hand">🖐️</span><span>📄 PAPER</span></button>
+            <button class="neon-choice-btn neon-scissors" data-choice="scissors"><span class="neon-big-hand">✌️</span><span>✂️ SCISSORS</span></button>
+          </div>
+
+          <div class="neon-actions">
+            <button class="neon-action-btn" id="rpsQuickPlayBtn">⚡ Quick Play</button>
+            <button class="neon-action-btn neon-quit" id="rpsForfeitBtn">🚩 Forfeit Match</button>
+          </div>
+        </div>
+
+        <aside class="neon-panel neon-stats">
+          <h3>📊 Match Stats</h3>
+          <div class="neon-stat"><span>🎮 Rounds</span><b id="rpsStatRounds">0</b></div>
+          <div class="neon-stat neon-win"><span>🏆 Wins</span><b id="rpsStatWins">0</b></div>
+          <div class="neon-stat neon-loss"><span>💀 Losses</span><b id="rpsStatLosses">0</b></div>
+          <div class="neon-stat neon-draw"><span>🤝 Draws</span><b id="rpsStatDraws">0</b></div>
+        </aside>
       </div>
-
-      <div class="choice-row" id="rpsChoiceRow">
-        <button class="choice-btn" data-choice="rock" title="Rock"></button>
-        <button class="choice-btn" data-choice="paper" title="Paper"></button>
-        <button class="choice-btn" data-choice="scissors" title="Scissors"></button>
-      </div>
-
-      <button class="rps-quit" id="rpsForfeitBtn">Forfeit match</button>
     </div>
   </section>
 
