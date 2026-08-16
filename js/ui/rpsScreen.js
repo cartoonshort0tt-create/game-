@@ -66,8 +66,16 @@
       if (wordIndex < CADENCE_WORDS.length) resultText.textContent = CADENCE_WORDS[wordIndex];
     }, 260);
 
+    // Rapidly cycle both hands through random choices to build suspense before the real reveal.
+    var shuffleTimer = setInterval(function () {
+      pHand.innerHTML = GA.Icons[GA.RPS.CHOICES[Math.floor(Math.random() * 3)]]();
+      bHand.innerHTML = GA.Icons[GA.RPS.CHOICES[Math.floor(Math.random() * 3)]]();
+      GA.Sfx.play('shuffle');
+    }, 90);
+
     setTimeout(function () {
       clearInterval(cadenceTimer);
+      clearInterval(shuffleTimer);
       pHand.classList.remove('charging');
       bHand.classList.remove('charging');
 
@@ -90,17 +98,20 @@
         bHand.className = 'rps-hand reveal-flip glow-lose';
         resultText.textContent = capitalize(playerChoice) + ' beats ' + botChoice + ' — you win the round!';
         resultText.className = 'round-result-text win';
+        GA.Arena.showToast('🔥 Nice throw!');
       } else if (outcome === 'bot') {
         match.botWins++;
         pHand.className = 'rps-hand reveal-flip glow-lose';
         bHand.className = 'rps-hand reveal-flip glow-win';
         resultText.textContent = capitalize(botChoice) + ' beats ' + playerChoice + ' — round lost.';
         resultText.className = 'round-result-text lose';
+        GA.Arena.showToast('💥 ' + match.bot.name + ' takes the round');
       } else {
         pHand.className = 'rps-hand reveal-flip glow-draw';
         bHand.className = 'rps-hand reveal-flip glow-draw';
         resultText.textContent = 'Both chose ' + playerChoice + ' — draw, replay the round.';
         resultText.className = 'round-result-text draw';
+        GA.Arena.showToast('🤝 Draw — go again');
       }
 
       renderDots($('rpsPlayerDots'), match.playerWins);

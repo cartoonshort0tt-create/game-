@@ -49,6 +49,7 @@
 
   var SOUNDS = {
     click: function () { tone(520, 0, 0.06, 'square', 0.05); },
+    shuffle: function () { tone(300 + Math.random() * 120, 0, 0.035, 'square', 0.025); },
     select: function () { tone(700, 0, 0.08, 'sine', 0.07); },
     open: function () { tone(500, 0, 0.05, 'sine', 0.05); tone(680, 0.04, 0.07, 'sine', 0.05); },
     place: function () { tone(320, 0, 0.07, 'square', 0.08); tone(470, 0.04, 0.08, 'square', 0.06); },

@@ -52,7 +52,13 @@
     resultText.className = 'round-result-text cadence';
     GA.Sfx.play('flip');
 
+    var shuffleTimer = setInterval(function () {
+      setCoinFace(Math.random() < 0.5 ? 'heads' : 'tails');
+      GA.Sfx.play('shuffle');
+    }, 90);
+
     setTimeout(function () {
+      clearInterval(shuffleTimer);
       var landed = GA.CoinFlip.flip();
       disc.className = 'coin-disc landed-' + landed;
       setCoinFace(landed);
@@ -63,10 +69,12 @@
         match.playerWins++;
         resultText.textContent = 'It landed on ' + landed + ' — you called it! Round won.';
         resultText.className = 'round-result-text win';
+        GA.Arena.showToast('🔥 Called it!');
       } else {
         match.botWins++;
         resultText.textContent = 'It landed on ' + landed + ' — ' + match.bot.name + ' takes the round.';
         resultText.className = 'round-result-text lose';
+        GA.Arena.showToast('💥 ' + match.bot.name + ' takes the round');
       }
 
       renderDots($('coinflipPlayerDots'), match.playerWins);

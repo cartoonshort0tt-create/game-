@@ -332,10 +332,21 @@
     $('startMatchBtn').addEventListener('click', function () { GA.Sfx.play('click'); startMatch(); });
 
     $('resultsLobbyBtn').addEventListener('click', function () { GA.Sfx.play('click'); $('resultsOverlay').classList.add('hidden'); });
-    $('resultsAgainBtn').addEventListener('click', function () {
+    $('resultsChangeBtn').addEventListener('click', function () {
       GA.Sfx.play('click');
       $('resultsOverlay').classList.add('hidden');
       openStakeModal(state.activeGame);
+    });
+    $('resultsRematchBtn').addEventListener('click', function () {
+      GA.Sfx.play('click');
+      if (state.selectedStake > 0 && !GA.Wallet.canAfford(state.selectedStake)) {
+        showToast('Not enough coins for the same stake — pick a new one');
+        $('resultsOverlay').classList.add('hidden');
+        openStakeModal(state.activeGame);
+        return;
+      }
+      $('resultsOverlay').classList.add('hidden');
+      startMatch();
     });
   }
 
